@@ -10,7 +10,7 @@ package com.jdespinosa.demo.restaurant.commons.exception;
 public class NotFoundException extends RuntimeException {
 
     public NotFoundException(String entity, Long id) {
-        super("Entity " + entity + ".id=" + id + " not found");
+        super(entity + ".id=" + id + " not found");
     }
 
     public NotFoundException(String message) {
