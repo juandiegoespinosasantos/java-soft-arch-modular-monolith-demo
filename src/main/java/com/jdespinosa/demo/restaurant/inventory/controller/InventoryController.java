@@ -1,5 +1,6 @@
 package com.jdespinosa.demo.restaurant.inventory.controller;
 
+import com.jdespinosa.demo.restaurant.commons.exception.NotFoundException;
 import com.jdespinosa.demo.restaurant.inventory.model.dto.AdjustInventoryRequestDTO;
 import com.jdespinosa.demo.restaurant.inventory.model.dto.InventoryDTO;
 import com.jdespinosa.demo.restaurant.inventory.model.dto.InventoryRequestDTO;
@@ -40,30 +41,28 @@ public class InventoryController implements IInventoryController {
     }
 
     @Override
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<InventoryDTO>> findAll() {
         List<InventoryDTO> list = service.findAll();
-        HttpStatus status = list.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK;
 
-        return buildResponse(list, status);
+        return buildResponse(list);
     }
 
     @Override
     @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<InventoryDTO> findById(@PathVariable("id") Long id) {
         Optional<InventoryDTO> opt = service.find(id);
-        HttpStatus status = opt.isPresent() ? HttpStatus.OK : HttpStatus.NOT_FOUND;
+        if (opt.isEmpty()) throw new NotFoundException("Inventory", id);
 
-        return buildResponse(opt.orElse(null), status);
+        return buildResponse(opt.get());
     }
 
     @Override
     @GetMapping(path = "/low-stock")
     public ResponseEntity<List<InventoryDTO>> lowStock() {
         List<InventoryDTO> list = service.findLowStock();
-        HttpStatus status = list.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK;
 
-        return buildResponse(list, status);
+        return buildResponse(list);
     }
 
     @Override
@@ -80,19 +79,23 @@ public class InventoryController implements IInventoryController {
                                                @RequestBody InventoryRequestDTO requestBody) {
         InventoryDTO updated = service.update(id, requestBody);
 
-        return buildResponse(updated, HttpStatus.OK);
+        return buildResponse(updated);
     }
 
     @Override
     @PatchMapping(path = "/{id}/adjust", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<InventoryDTO> adjust(@PathVariable("id") Long id,
                                                @RequestBody AdjustInventoryRequestDTO requestBody) {
-        InventoryDTO updated = service.adjust(id, requestBody);
+        InventoryDTO adjusted = service.adjust(id, requestBody);
 
-        return buildResponse(updated, HttpStatus.OK);
+        return buildResponse(adjusted);
     }
 
     private <T> ResponseEntity<T> buildResponse(final T data, final HttpStatusCode statusCode) {
         return new ResponseEntity<>(data, statusCode);
+    }
+
+    private <T> ResponseEntity<T> buildResponse(final T data) {
+        return buildResponse(data, HttpStatus.OK);
     }
 }

@@ -1,5 +1,6 @@
 package com.jdespinosa.demo.restaurant.inventory.controller;
 
+import com.jdespinosa.demo.restaurant.commons.exception.NotFoundException;
 import com.jdespinosa.demo.restaurant.inventory.model.dto.AdjustInventoryRequestDTO;
 import com.jdespinosa.demo.restaurant.inventory.model.dto.InventoryDTO;
 import com.jdespinosa.demo.restaurant.inventory.model.dto.InventoryRequestDTO;
@@ -81,7 +82,7 @@ class InventoryControllerTest {
 
         // then
         Assertions.assertNotNull(actualResponse);
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, actualResponse.getStatusCode());
+        Assertions.assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
 
         Mockito.verify(mockService).findAll();
     }
@@ -114,12 +115,8 @@ class InventoryControllerTest {
 
         Mockito.when(mockService.find(id)).thenReturn(Optional.empty());
 
-        // when
-        ResponseEntity<InventoryDTO> actualResponse = controller.findById(id);
-
-        // then
-        Assertions.assertNotNull(actualResponse);
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, actualResponse.getStatusCode());
+        // when & then
+        Assertions.assertThrows(NotFoundException.class, () -> controller.findById(id), "Entity Recipe.id=1 not found");
 
         Mockito.verify(mockService).find(id);
     }
@@ -167,7 +164,7 @@ class InventoryControllerTest {
 
         // then
         Assertions.assertNotNull(actualResponse);
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, actualResponse.getStatusCode());
+        Assertions.assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
 
         Mockito.verify(mockService).findLowStock();
     }

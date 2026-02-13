@@ -1,12 +1,12 @@
 package com.jdespinosa.demo.restaurant.inventory.services;
 
+import com.jdespinosa.demo.restaurant.commons.exception.NotFoundException;
 import com.jdespinosa.demo.restaurant.inventory.model.dto.AdjustInventoryRequestDTO;
 import com.jdespinosa.demo.restaurant.inventory.model.dto.InventoryDTO;
 import com.jdespinosa.demo.restaurant.inventory.model.dto.InventoryRequestDTO;
 import com.jdespinosa.demo.restaurant.inventory.model.entities.Inventory;
 import com.jdespinosa.demo.restaurant.inventory.model.repositories.InventoryRepository;
 import com.jdespinosa.demo.restaurant.inventory.utils.adapters.InventoryAdapter;
-import com.jdespinosa.demo.restaurant.commons.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +40,13 @@ public class InventoryService implements IInventoryService {
     }
 
     @Override
+    public List<InventoryDTO> findLowStock() {
+        List<Inventory> inventories = repository.findLowStock();
+
+        return InventoryAdapter.transform(inventories);
+    }
+
+    @Override
     public Optional<InventoryDTO> find(final Long id) {
         Optional<Inventory> opt = repository.findById(id);
         if (opt.isEmpty()) return Optional.empty();
@@ -50,24 +57,17 @@ public class InventoryService implements IInventoryService {
     }
 
     @Override
-    public List<InventoryDTO> findLowStock() {
-        List<Inventory> inventories = repository.findLowStock();
-
-        return InventoryAdapter.transform(inventories);
-    }
-
-    @Override
     @Transactional
     public InventoryDTO create(final InventoryRequestDTO requestBody) {
         Inventory entity = InventoryAdapter.transform(requestBody);
-        Inventory created = repository.save(entity);
+        entity = repository.save(entity);
 
-        return InventoryAdapter.transform(created);
+        return InventoryAdapter.transform(entity);
     }
 
     @Override
     @Transactional
-    public InventoryDTO update(final Long id, final InventoryRequestDTO requestBody) {
+    public InventoryDTO update(final Long id, final InventoryRequestDTO requestBody) throws NotFoundException {
         Optional<Inventory> pivotOpt = repository.findById(id);
         if (pivotOpt.isEmpty()) throw new NotFoundException("Inventory", id);
 
@@ -77,14 +77,14 @@ public class InventoryService implements IInventoryService {
         pivot.setUnit(requestBody.unit());
         pivot.setMinStock(requestBody.minStock());
 
-        Inventory updated = repository.save(pivot);
+        pivot = repository.save(pivot);
 
-        return InventoryAdapter.transform(updated);
+        return InventoryAdapter.transform(pivot);
     }
 
     @Override
     @Transactional
-    public InventoryDTO adjust(final Long id, final AdjustInventoryRequestDTO requestBody) {
+    public InventoryDTO adjust(final Long id, final AdjustInventoryRequestDTO requestBody) throws NotFoundException {
         Optional<Inventory> pivotOpt = repository.findById(id);
         if (pivotOpt.isEmpty()) throw new NotFoundException("Inventory", id);
 
