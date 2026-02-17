@@ -1,4 +1,4 @@
-package com.jdespinosa.demo.restaurant.inventory.controller;
+package com.jdespinosa.demo.restaurant.inventory.controllers;
 
 import com.jdespinosa.demo.restaurant.commons.exception.NotFoundException;
 import com.jdespinosa.demo.restaurant.inventory.model.dto.AdjustInventoryRequestDTO;

@@ -1,5 +1,6 @@
-package com.jdespinosa.demo.restaurant.inventory.controller;
+package com.jdespinosa.demo.restaurant.inventory.controllers;
 
+import com.jdespinosa.demo.restaurant.commons.controllers.IBasicController;
 import com.jdespinosa.demo.restaurant.inventory.model.dto.AdjustInventoryRequestDTO;
 import com.jdespinosa.demo.restaurant.inventory.model.dto.InventoryDTO;
 import com.jdespinosa.demo.restaurant.inventory.model.dto.InventoryRequestDTO;
@@ -14,17 +15,9 @@ import java.util.List;
  * @version Feb 11, 2026
  * @since 17
  */
-public interface IInventoryController {
-
-    ResponseEntity<List<InventoryDTO>> findAll();
-
-    ResponseEntity<InventoryDTO> findById(Long id);
+public interface IInventoryController extends IBasicController<Long, InventoryDTO, InventoryRequestDTO> {
 
     ResponseEntity<List<InventoryDTO>> lowStock();
-
-    ResponseEntity<InventoryDTO> create(InventoryRequestDTO requestBody);
-
-    ResponseEntity<InventoryDTO> update(Long id, InventoryRequestDTO requestBody);
 
     ResponseEntity<InventoryDTO> adjust(Long id, AdjustInventoryRequestDTO requestBody);
 }
