@@ -1,6 +1,7 @@
 package com.jdespinosa.demo.restaurant.recipes.services;
 
 import com.jdespinosa.demo.restaurant.commons.exception.NotFoundException;
+import com.jdespinosa.demo.restaurant.commons.services.BasicService;
 import com.jdespinosa.demo.restaurant.recipes.model.dto.RecipeDTO;
 import com.jdespinosa.demo.restaurant.recipes.model.dto.RecipeRequestDTO;
 import com.jdespinosa.demo.restaurant.recipes.model.entities.Recipe;
@@ -22,84 +23,74 @@ import java.util.Optional;
  */
 @Service
 @Transactional(readOnly = true)
-public class RecipeService implements IRecipeService {
-
-    private final RecipeRepository repository;
+public class RecipeService extends BasicService<Long, Recipe, RecipeDTO, RecipeRequestDTO> implements IRecipeService {
 
     @Autowired
     public RecipeService(RecipeRepository repository) {
-        this.repository = repository;
+        super(repository);
     }
 
     @Override
-    public List<RecipeDTO> findAll() {
-        List<Recipe> recipes = repository.findAll();
-
-        return RecipeAdapter.transform(recipes);
+    protected String getEntityName() {
+        return "Recipe";
     }
 
     @Override
-    public List<RecipeDTO> findActives() {
-        List<Recipe> recipes = repository.findByActiveTrue();
-
-        return RecipeAdapter.transform(recipes);
+    protected List<RecipeDTO> transformToTOList(final List<Recipe> entities) {
+        return RecipeAdapter.transform(entities);
     }
 
     @Override
-    public Optional<RecipeDTO> find(final Long id) throws NotFoundException {
-        Optional<Recipe> opt = repository.findById(id);
-        if (opt.isEmpty()) return Optional.empty();
-
-        RecipeDTO dto = RecipeAdapter.transform(opt.get());
-
-        return Optional.of(dto);
-    }
-
-    @Override
-    @Transactional
-    public RecipeDTO create(final RecipeRequestDTO requestBody) {
-        Recipe entity = RecipeAdapter.transform(requestBody);
-        entity.setActive(true);
-
-        entity = repository.save(entity);
-
+    protected RecipeDTO transformToTO(final Recipe entity) {
         return RecipeAdapter.transform(entity);
     }
 
     @Override
-    @Transactional
-    public RecipeDTO update(final Long id, final RecipeRequestDTO requestBody) throws NotFoundException {
-        Optional<Recipe> pivotOpt = repository.findById(id);
-        if (pivotOpt.isEmpty()) throw new NotFoundException("Recipe", id);
+    protected Recipe transformToEntity(final RecipeRequestDTO requestBody) {
+        return RecipeAdapter.transform(requestBody);
+    }
 
-        Recipe pivot = pivotOpt.get();
+    @Override
+    protected void updateEntity(final Recipe pivot, final RecipeRequestDTO requestBody) {
         pivot.setName(requestBody.name());
         pivot.setDescription(requestBody.description());
         pivot.setPrice(requestBody.price());
         pivot.setPreparationTimeMinutes(requestBody.preparationTimeMinutes());
+    }
 
-        pivot = repository.save(pivot);
+    @Override
+    public List<RecipeDTO> findActives() {
+        List<Recipe> recipes = ((RecipeRepository) getRepository()).findByActiveTrue();
 
-        return RecipeAdapter.transform(pivot);
+        return transformToTOList(recipes);
+    }
+
+    @Override
+    public RecipeDTO create(RecipeRequestDTO requestBody) {
+        Recipe entity = transformToEntity(requestBody);
+        entity.setActive(true);
+        entity = getRepository().save(entity);
+
+        return transformToTO(entity);
     }
 
     @Override
     @Transactional
     public void delete(Long id) throws NotFoundException {
-        Optional<Recipe> pivotOpt = repository.findById(id);
+        Optional<Recipe> pivotOpt = getRepository().findById(id);
         if (pivotOpt.isEmpty()) throw new NotFoundException("Recipe", id);
 
         Recipe pivot = pivotOpt.get();
         pivot.setActive(false);
 
-        repository.save(pivot);
+        getRepository().save(pivot);
     }
 
     // For internal cross-module use
     // TODO
     @Override
     public Recipe getEntity(Long id) {
-        return repository.findById(id)
+        return getRepository().findById(id)
                 .orElseThrow(() -> new NotFoundException("Recipe", id));
     }
 }

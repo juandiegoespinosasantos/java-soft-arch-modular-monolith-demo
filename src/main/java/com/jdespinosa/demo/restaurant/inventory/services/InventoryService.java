@@ -1,6 +1,7 @@
 package com.jdespinosa.demo.restaurant.inventory.services;
 
 import com.jdespinosa.demo.restaurant.commons.exception.NotFoundException;
+import com.jdespinosa.demo.restaurant.commons.services.BasicService;
 import com.jdespinosa.demo.restaurant.inventory.model.dto.AdjustInventoryRequestDTO;
 import com.jdespinosa.demo.restaurant.inventory.model.dto.InventoryDTO;
 import com.jdespinosa.demo.restaurant.inventory.model.dto.InventoryRequestDTO;
@@ -23,78 +24,66 @@ import java.util.Optional;
  */
 @Service
 @Transactional(readOnly = true)
-public class InventoryService implements IInventoryService {
-
-    private final InventoryRepository repository;
+public class InventoryService extends BasicService<Long, Inventory, InventoryDTO, InventoryRequestDTO> implements IInventoryService {
 
     @Autowired
     public InventoryService(InventoryRepository repository) {
-        this.repository = repository;
+        super(repository);
     }
 
     @Override
-    public List<InventoryDTO> findAll() {
-        List<Inventory> inventories = repository.findAll();
-
-        return InventoryAdapter.transform(inventories);
+    protected String getEntityName() {
+        return "Inventory";
     }
 
     @Override
-    public List<InventoryDTO> findLowStock() {
-        List<Inventory> inventories = repository.findLowStock();
-
-        return InventoryAdapter.transform(inventories);
+    protected List<InventoryDTO> transformToTOList(final List<Inventory> entities) {
+        return InventoryAdapter.transform(entities);
     }
 
     @Override
-    public Optional<InventoryDTO> find(final Long id) {
-        Optional<Inventory> opt = repository.findById(id);
-        if (opt.isEmpty()) return Optional.empty();
-
-        InventoryDTO dto = InventoryAdapter.transform(opt.get());
-
-        return Optional.of(dto);
-    }
-
-    @Override
-    @Transactional
-    public InventoryDTO create(final InventoryRequestDTO requestBody) {
-        Inventory entity = InventoryAdapter.transform(requestBody);
-        entity = repository.save(entity);
-
+    protected InventoryDTO transformToTO(final Inventory entity) {
         return InventoryAdapter.transform(entity);
     }
 
     @Override
-    @Transactional
-    public InventoryDTO update(final Long id, final InventoryRequestDTO requestBody) throws NotFoundException {
-        Optional<Inventory> pivotOpt = repository.findById(id);
-        if (pivotOpt.isEmpty()) throw new NotFoundException("Inventory", id);
+    protected Inventory transformToEntity(final InventoryRequestDTO requestBody) {
+        return InventoryAdapter.transform(requestBody);
+    }
 
-        Inventory pivot = pivotOpt.get();
+    @Override
+    protected void updateEntity(final Inventory pivot, final InventoryRequestDTO requestBody) {
         pivot.setIngredientName(requestBody.ingredientName());
         pivot.setQuantity(requestBody.quantity());
         pivot.setUnit(requestBody.unit());
         pivot.setMinStock(requestBody.minStock());
+    }
 
-        pivot = repository.save(pivot);
+    @Override
+    public List<InventoryDTO> findLowStock() {
+        List<Inventory> inventories = ((InventoryRepository) getRepository()).findLowStock();
 
-        return InventoryAdapter.transform(pivot);
+        return transformToTOList(inventories);
+    }
+
+    @Override
+    public void delete(Long id) throws NotFoundException {
+        throw new UnsupportedOperationException("Delete Inventory not supported just yet!");
     }
 
     @Override
     @Transactional
     public InventoryDTO adjust(final Long id, final AdjustInventoryRequestDTO requestBody) throws NotFoundException {
-        Optional<Inventory> pivotOpt = repository.findById(id);
-        if (pivotOpt.isEmpty()) throw new NotFoundException("Inventory", id);
+        Optional<Inventory> pivotOpt = getRepository().findById(id);
+        if (pivotOpt.isEmpty()) throw new NotFoundException(getEntityName(), id);
 
         Inventory pivot = pivotOpt.get();
         double newQty = pivot.getQuantity() + requestBody.quantity();
         if (newQty < 0.0) throw new IllegalArgumentException("Insufficient stock for the adjustment");
 
         pivot.setQuantity(newQty);
-        Inventory updated = repository.save(pivot);
+        Inventory adjusted = getRepository().save(pivot);
 
-        return InventoryAdapter.transform(updated);
+        return transformToTO(adjusted);
     }
 }

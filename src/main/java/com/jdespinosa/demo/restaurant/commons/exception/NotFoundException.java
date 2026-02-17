@@ -9,7 +9,7 @@ package com.jdespinosa.demo.restaurant.commons.exception;
  */
 public class NotFoundException extends RuntimeException {
 
-    public NotFoundException(String entity, Long id) {
+    public NotFoundException(String entity, Object id) {
         super(entity + ".id=" + id + " not found");
     }
 
