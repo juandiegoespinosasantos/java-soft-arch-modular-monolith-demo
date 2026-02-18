@@ -17,6 +17,4 @@ import java.util.List;
 public interface IRecipeService extends IBasicService<Long, RecipeDTO, RecipeRequestDTO> {
 
     List<RecipeDTO> findActives();
-
-    Recipe getEntity(Long id);
 }

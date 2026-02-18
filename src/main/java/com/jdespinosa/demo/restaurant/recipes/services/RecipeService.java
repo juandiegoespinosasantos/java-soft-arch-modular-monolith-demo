@@ -36,12 +36,12 @@ public class RecipeService extends BasicService<Long, Recipe, RecipeDTO, RecipeR
     }
 
     @Override
-    protected List<RecipeDTO> transformToTOList(final List<Recipe> entities) {
+    protected List<RecipeDTO> transformToDTOList(final List<Recipe> entities) {
         return RecipeAdapter.transform(entities);
     }
 
     @Override
-    protected RecipeDTO transformToTO(final Recipe entity) {
+    protected RecipeDTO transformToDTO(final Recipe entity) {
         return RecipeAdapter.transform(entity);
     }
 
@@ -62,7 +62,7 @@ public class RecipeService extends BasicService<Long, Recipe, RecipeDTO, RecipeR
     public List<RecipeDTO> findActives() {
         List<Recipe> recipes = ((RecipeRepository) getRepository()).findByActiveTrue();
 
-        return transformToTOList(recipes);
+        return transformToDTOList(recipes);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class RecipeService extends BasicService<Long, Recipe, RecipeDTO, RecipeR
         entity.setActive(true);
         entity = getRepository().save(entity);
 
-        return transformToTO(entity);
+        return transformToDTO(entity);
     }
 
     @Override
@@ -84,13 +84,5 @@ public class RecipeService extends BasicService<Long, Recipe, RecipeDTO, RecipeR
         pivot.setActive(false);
 
         getRepository().save(pivot);
-    }
-
-    // For internal cross-module use
-    // TODO
-    @Override
-    public Recipe getEntity(Long id) {
-        return getRepository().findById(id)
-                .orElseThrow(() -> new NotFoundException("Recipe", id));
     }
 }

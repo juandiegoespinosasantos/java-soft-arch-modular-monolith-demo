@@ -37,12 +37,12 @@ public class InventoryService extends BasicService<Long, Inventory, InventoryDTO
     }
 
     @Override
-    protected List<InventoryDTO> transformToTOList(final List<Inventory> entities) {
+    protected List<InventoryDTO> transformToDTOList(final List<Inventory> entities) {
         return InventoryAdapter.transform(entities);
     }
 
     @Override
-    protected InventoryDTO transformToTO(final Inventory entity) {
+    protected InventoryDTO transformToDTO(final Inventory entity) {
         return InventoryAdapter.transform(entity);
     }
 
@@ -63,7 +63,7 @@ public class InventoryService extends BasicService<Long, Inventory, InventoryDTO
     public List<InventoryDTO> findLowStock() {
         List<Inventory> inventories = ((InventoryRepository) getRepository()).findLowStock();
 
-        return transformToTOList(inventories);
+        return transformToDTOList(inventories);
     }
 
     @Override
@@ -84,6 +84,6 @@ public class InventoryService extends BasicService<Long, Inventory, InventoryDTO
         pivot.setQuantity(newQty);
         Inventory adjusted = getRepository().save(pivot);
 
-        return transformToTO(adjusted);
+        return transformToDTO(adjusted);
     }
 }

@@ -3,6 +3,7 @@ package com.jdespinosa.demo.restaurant.recipes.utils.adapters;
 import com.jdespinosa.demo.restaurant.recipes.model.dto.RecipeDTO;
 import com.jdespinosa.demo.restaurant.recipes.model.dto.RecipeRequestDTO;
 import com.jdespinosa.demo.restaurant.recipes.model.entities.Recipe;
+import lombok.experimental.UtilityClass;
 
 import java.util.List;
 
@@ -13,10 +14,8 @@ import java.util.List;
  * @version Feb 12, 2026
  * @since 17
  */
-public final class RecipeAdapter {
-
-    private RecipeAdapter() {
-    }
+@UtilityClass
+public class RecipeAdapter {
 
     /**
      * Transforms DTO into entity.
@@ -24,7 +23,7 @@ public final class RecipeAdapter {
      * @param dto Data transfer object.
      * @return Recipe entity.
      */
-    public static Recipe transform(final RecipeRequestDTO dto) {
+    public Recipe transform(final RecipeRequestDTO dto) {
         return Recipe.builder()
                 .name(dto.name())
                 .description(dto.description())
@@ -39,7 +38,7 @@ public final class RecipeAdapter {
      * @param entity Entity.
      * @return Recipe data transfer object.
      */
-    public static RecipeDTO transform(final Recipe entity) {
+    public RecipeDTO transform(final Recipe entity) {
         return RecipeDTO.builder()
                 .id(entity.getId())
                 .name(entity.getName())
@@ -56,7 +55,7 @@ public final class RecipeAdapter {
      * @param entities List of entities.
      * @return List of Recipe data transfer objects.
      */
-    public static List<RecipeDTO> transform(final List<Recipe> entities) {
+    public List<RecipeDTO> transform(final List<Recipe> entities) {
         return entities.stream()
                 .map(RecipeAdapter::transform)
                 .toList();

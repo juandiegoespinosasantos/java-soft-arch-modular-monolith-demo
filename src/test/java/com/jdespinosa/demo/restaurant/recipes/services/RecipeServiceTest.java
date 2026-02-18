@@ -251,37 +251,6 @@ class RecipeServiceTest {
         Mockito.verifyNoMoreInteractions(mockRepository);
     }
 
-    @Test
-    void givenExistentId_whenGetEntity_thenReturnEntity() {
-        // given
-        long id = 1L;
-
-        Recipe recipe = buildEntity(1L, "Recipe A", 2_000.0, 15, true);
-        Mockito.when(mockRepository.findById(id)).thenReturn(Optional.of(recipe));
-
-        // when
-        Recipe actual = service.getEntity(id);
-
-        // then
-        Assertions.assertNotNull(actual);
-        Assertions.assertEquals(recipe, actual);
-
-        Mockito.verify(mockRepository).findById(id);
-    }
-
-    @Test
-    void givenNonExistentId_whenGetEntity_thenThrowNotFoundException() {
-        // given
-        long id = 1L;
-
-        Mockito.when(mockRepository.findById(id)).thenReturn(Optional.empty());
-
-        // when & then
-        Assertions.assertThrows(NotFoundException.class, () -> service.getEntity(id), "Recipe.id=" + id + "not found");
-
-        Mockito.verify(mockRepository).findById(id);
-    }
-
     private Recipe buildEntity(long id, String name, double price, int preparationTimeMinutes, boolean active) {
         return Recipe.builder()
                 .id(id)

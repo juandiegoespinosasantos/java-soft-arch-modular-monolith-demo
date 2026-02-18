@@ -3,6 +3,7 @@ package com.jdespinosa.demo.restaurant.inventory.utils.adapters;
 import com.jdespinosa.demo.restaurant.inventory.model.dto.InventoryDTO;
 import com.jdespinosa.demo.restaurant.inventory.model.dto.InventoryRequestDTO;
 import com.jdespinosa.demo.restaurant.inventory.model.entities.Inventory;
+import lombok.experimental.UtilityClass;
 
 import java.util.List;
 
@@ -13,10 +14,8 @@ import java.util.List;
  * @version Feb 10, 2026
  * @since 17
  */
+@UtilityClass
 public final class InventoryAdapter {
-
-    private InventoryAdapter() {
-    }
 
     /**
      * Transforms DTO into entity.
@@ -24,7 +23,7 @@ public final class InventoryAdapter {
      * @param dto Data transfer object.
      * @return Inventory entity.
      */
-    public static Inventory transform(final InventoryRequestDTO dto) {
+    public Inventory transform(final InventoryRequestDTO dto) {
         return Inventory.builder()
                 .ingredientName(dto.ingredientName())
                 .quantity(dto.quantity())
@@ -39,7 +38,7 @@ public final class InventoryAdapter {
      * @param entity Entity.
      * @return Inventory data transfer object.
      */
-    public static InventoryDTO transform(final Inventory entity) {
+    public InventoryDTO transform(final Inventory entity) {
         double quantity = entity.getQuantity();
         double minStock = entity.getMinStock();
 
@@ -58,7 +57,7 @@ public final class InventoryAdapter {
      * @param entities List of entities.
      * @return List of Inventory data transfer objects.
      */
-    public static List<InventoryDTO> transform(final List<Inventory> entities) {
+    public List<InventoryDTO> transform(final List<Inventory> entities) {
         return entities.stream()
                 .map(InventoryAdapter::transform)
                 .toList();

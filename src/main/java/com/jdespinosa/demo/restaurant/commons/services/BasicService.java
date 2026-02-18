@@ -31,9 +31,9 @@ public abstract class BasicService<I, E, T, R> implements IBasicService<I, T, R>
 
     protected abstract String getEntityName();
 
-    protected abstract List<T> transformToTOList(List<E> entities);
+    protected abstract List<T> transformToDTOList(List<E> entities);
 
-    protected abstract T transformToTO(E entity);
+    protected abstract T transformToDTO(E entity);
 
     protected abstract E transformToEntity(R requestBody);
 
@@ -43,7 +43,7 @@ public abstract class BasicService<I, E, T, R> implements IBasicService<I, T, R>
     public List<T> findAll() {
         List<E> entities = repository.findAll();
 
-        return transformToTOList(entities);
+        return transformToDTOList(entities);
     }
 
     @Override
@@ -51,7 +51,7 @@ public abstract class BasicService<I, E, T, R> implements IBasicService<I, T, R>
         Optional<E> opt = repository.findById(id);
         if (opt.isEmpty()) return Optional.empty();
 
-        T dto = transformToTO(opt.get());
+        T dto = transformToDTO(opt.get());
 
         return Optional.of(dto);
     }
@@ -62,7 +62,7 @@ public abstract class BasicService<I, E, T, R> implements IBasicService<I, T, R>
         E entity = transformToEntity(requestBody);
         entity = repository.save(entity);
 
-        return transformToTO(entity);
+        return transformToDTO(entity);
     }
 
     @Override
@@ -76,7 +76,7 @@ public abstract class BasicService<I, E, T, R> implements IBasicService<I, T, R>
 
         pivot = getRepository().save(pivot);
 
-        return transformToTO(pivot);
+        return transformToDTO(pivot);
     }
 
     @Override
