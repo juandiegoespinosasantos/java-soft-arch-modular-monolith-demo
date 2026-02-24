@@ -53,7 +53,7 @@ public class OrderPreparationController implements IOrderPreparationController {
     @GetMapping(path = "/order/{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<OrderPreparationDTO> findByOrder(@PathVariable("orderId") Long orderId) {
         Optional<OrderPreparationDTO> opt = service.findByOrderId(orderId);
-        if (opt.isEmpty()) throw new NotFoundException("Order preparation", orderId.toString());
+        if (opt.isEmpty()) throw new NotFoundException("Order", orderId.toString());
 
         return ResponseEntity.ok(opt.get());
     }

@@ -83,8 +83,8 @@ public class OrderPreparationService implements IOrderPreparationService {
                 .status(OrderPreparationStatuses.IN_PROGRESS)
                 .startedAt(LocalDateTime.now())
                 .build();
+        orderPreparation = repository.save(orderPreparation);
 
-        repository.save(orderPreparation);
         orderService.updateStatus(orderId, OrderStatuses.PREPARING);
 
         return OrderPreparationAdapter.transform(orderPreparation);
