@@ -4,7 +4,7 @@ import com.jdespinosa.demo.restaurant.commons.exception.NotFoundException;
 import com.jdespinosa.demo.restaurant.prepareorder.model.dto.OrderPreparationDTO;
 import com.jdespinosa.demo.restaurant.prepareorder.model.enums.OrderPreparationStatuses;
 import com.jdespinosa.demo.restaurant.prepareorder.services.IOrderPreparationService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,10 +28,14 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api/v1/preparations")
-@RequiredArgsConstructor
 public class OrderPreparationController implements IOrderPreparationController {
 
     private final IOrderPreparationService service;
+
+    @Autowired
+    public OrderPreparationController(IOrderPreparationService service) {
+        this.service = service;
+    }
 
     @Override
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

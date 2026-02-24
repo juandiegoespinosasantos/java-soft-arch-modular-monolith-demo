@@ -4,7 +4,7 @@ import com.jdespinosa.demo.restaurant.commons.exception.NotFoundException;
 import com.jdespinosa.demo.restaurant.payment.model.dto.PaymentDTO;
 import com.jdespinosa.demo.restaurant.payment.model.dto.PaymentRequestDTO;
 import com.jdespinosa.demo.restaurant.payment.services.IPaymentService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,10 +27,14 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api/v1/payments")
-@RequiredArgsConstructor
 public class PaymentController implements IPaymentController {
 
     private final IPaymentService service;
+
+    @Autowired
+    public PaymentController(IPaymentService service) {
+        this.service = service;
+    }
 
     @Override
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
